@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>APA Citation Tool</title>
+</head>
+<body>
+<div id="select_source">
+    <p>
+        <label>Select Source Type: </label>
+        <select id="selected_source">
+            <option>Book</option>
+            <option>Webpage</option>
+            <option>Wikipedia</option>
+        </select>
+    </p>
+    <p><button onclick="javascript:source_selected();">Next</button></p>
+</div>
+<div id="book_info" style="display: none;">
+    <p><label>Title: </label><input type="text" id="book_title" /></p>
+    <div class="authors">
+        <p><label>Author: </label><input type="text" /></p>
+    </div>
+    <p>
+        <button onclick="javascript:add_author();">Add Another Author</button>
+        <button onclick="javascript:remove_author();">Remove Last Author</button>
+    </p>
+    <p><label>Year: </label><input type="text" id="book_year" /></p>
+    <p><label>Publisher: </label><input type="text" id="book_publisher" /></p>
+    <p><label>Publisher Location: </label><input type="text" id="book_publisher_location" /></p>
+    <p><button onclick="javascript:generate_citation('book');">Next</button></p>
+</div>
+<div id="citations" style="display: none;">
+    <p>In-text Citation:</p>
+    <pre id="in_text" style="background: #bbf;">
+    </pre>
+    <p>Reference List:</p>
+    <pre id="reference_list" style="background: #bbf;">
+    </pre>
+</div>
+<script language="Javascript">
+var current_view = "select_source";
+
+function source_selected()
+{
+    var view = document.getElementById(current_view);
+    var selected_source = document.getElementById("selected_source").value;
+    current_view = `${selected_source.toLowerCase()}_info`;
+    var new_view = document.getElementById(current_view);
+    new_view.setAttribute("style", null);
+    view.setAttribute("style", "display: none;");
+}
+
+function add_author()
+{
+    var view = document.getElementById(current_view);
+    var authors_div;
+    for (i in view.children)
+    {
+        if (view.children[i].className == "authors")
+            authors_div = view.children[i];
+    }
+    var new_author = document.createElement("p");
+    var auth_label = document.createElement("label");
+    auth_label.innerText = "Author: ";
+    new_author.appendChild(auth_label);
+    var auth_inp = document.createElement("input");
+    auth_inp.setAttribute("type", "text");
+    new_author.appendChild(auth_inp);
+    authors_div.appendChild(new_author);
+}
+
+function remove_author()
+{
+    var view = document.getElementById(current_view);
+    var authors_div;
+    for (i in view.children)
+    {
+        if (view.children[i].className == "authors")
+            authors_div = view.children[i];
+    }
+    authors_div.removeChild(authors_div.children[authors_div.children.length - 1]);
+}
+
+function get_authors(view)
+{
+    var author_div;
+    for (var i = 0; i < view.children.length; i++)
+    {
+        if (view.children[i].className == "authors")
+        {
+            author_div = view.children[i];
+            break;
+        }
+    }
+
+    var auth_inputs = author_div.getElementsByTagName("input");
+    var authors = [];
+    for (i = 0; i < auth_inputs.length; i++)
+    {
+        a_str = auth_inputs[i].value;
+        parts = a_str.split(' ');
+        last_name = parts.pop();
+        initials = parts.map(p => p[0] + ".").join('');
+        full_name = `${last_name}, ${initials}`;
+        authors.push(full_name);
+    }
+    return authors;
+}
+
+function format_in_text(authors, year)
+{
+    var last_names = authors.map(a => a.split(' ')[0].replace(",", ""));
+    var in_text = "";
+    if (last_names.length > 1 && last_names.length < 6)
+    {
+        last_auth = last_names.pop();
+        last_auth = "& " + last_auth;
+        last_names.push(last_auth);
+    } else if (last_names.length >= 6)
+    {
+        last_names = [last_names[0] + " et al."];
+    }
+    var j_str;
+    if (last_names.length == 2)
+        j_str = " ";
+    else
+        j_str = ", ";
+    in_text = `(${last_names.join(j_str)}, ${year})`;
+    return in_text;
+}
+
+function format_reference(src_type, requirements)
+{
+    // get authors
+    var authors = requirements.authors.map(x => x);
+    if (authors.length > 7)
+    {
+        last_auth = authors.pop();
+        last_auth = "... " + last_auth;
+        authors = authors.slice(0, 6);
+        authors.push(last_auth);
+    }
+    else if (authors.length > 1)
+    {
+        last_auth = authors.pop();
+        last_auth = "& " + last_auth;
+        authors.push(last_auth);
+    }
+    authors = authors.join(", ");
+
+    // get year
+    var year = `(${requirements.year}).`;
+
+    // format title
+    var title = requirements.title.toLowerCase();
+    title = title[0].toUpperCase() + title.slice(1);
+    // deal with subtitles
+    var colon = title.indexOf(":");
+    if (colon != -1)
+    {
+        do
+        {
+            colon++;
+        } while (title[colon] == " ");
+        main_title = title.slice(0, colon);
+        sub = title[colon].toUpperCase() + title.slice(colon + 1);
+        title = main_title + sub;
+    }
+    var ref = `${authors} ${year} ${title}\n\t${requirements.publisher_location}: ${requirements.publisher}`;
+    return ref;
+}
+    
+
+function generate_citation(src_type)
+{
+    var view = document.getElementById(current_view);
+    var authors = get_authors(view);
+    var title = document.getElementById(`${src_type}_title`).value;
+    var year = document.getElementById(`${src_type}_year`).value;
+    var publisher = document.getElementById(`${src_type}_publisher`).value;
+    var publisher_location = document.getElementById(`${src_type}_publisher_location`).value;
+    var in_text = format_in_text(authors, year);
+    var requirements = {};
+    requirements.authors = authors;
+    requirements.title = title;
+    requirements.year = year;
+    requirements.publisher = publisher;
+    requirements.publisher_location = publisher_location;
+    var reference = format_reference(src_type, requirements);
+    var it_el = document.getElementById("in_text");
+    it_el.innerText = in_text;
+    var ref_list = document.getElementById("reference_list");
+    ref_list.innerText = reference;
+    current_view = "citations";
+    var new_view = document.getElementById("citations");
+    new_view.setAttribute("style", null);
+    view.setAttribute("style", "display: none;");
+}
+</script>
+</body>
+</html>
