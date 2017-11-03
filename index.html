@@ -5,6 +5,7 @@
 <title>APA Citation Tool</title>
 </head>
 <body>
+<p><a href="index.html">Home</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="about.html">About</a></p>
 <div id="select_source">
     <p>
         <label>Select Source Type: </label>
@@ -45,6 +46,11 @@ function source_selected()
 {
     var view = document.getElementById(current_view);
     var selected_source = document.getElementById("selected_source").value;
+    if (selected_source != "Book")
+    {
+        alert(`${selected_source} is not implemented in this prototype. Only books work for now.`);
+        return;
+    }
     current_view = `${selected_source.toLowerCase()}_info`;
     var new_view = document.getElementById(current_view);
     new_view.setAttribute("style", null);

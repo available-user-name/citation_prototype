@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>APA Citation Tool</title>
+</head>
+<body>
+<p><a href="index.html">Home</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="about.html">About</a></p>
+<h1>About</h1>
+<p>This is a very rough prototype for a tool to generate APA citations and reference list
+entries. At the moment, it only works for books. Ultimately, this will be able to generate
+citations and entries any source in APA format given the needed info. I'm hoping I'll be able to get a more usable version up by November 15, 2017. In the meantime, it can be used to format citations for books provided you have the title, author(s), year, publisher, and publisher location. Below is an attempt at documenting what the current version expects of input and limitations.</p>
+<h1>Usage Information</h1>
+<h2>Title</h2>
+<p>The title expects the format "Title of the book: Subtitle of the book". A ":" separates the main title from the subtitle. Capitalization is handled automatically.</p>
+<h2>Authors</h2>
+<p>The author name should be in the format "First Middle Last". The tool will deal with initials. For an author like J.K. Rowling, you would want to enter "J K Rowling". The Add/Remove Authors buttons will let you adjust how many authors to include. At the moment, single word authors aren't handled. Institutional names will be treated like a human's name (did I mention this is a very rough prototype?). The tool will properly deal with APA requirements on author count in terms of the citation/reference format.</p>
+<h2>Year</h2>
+<p>This should just be a four digit year.</p>
+<h2>Publisher</h2>
+<p>This should be the name of the publisher. No special formatting takes place.</p>
+<h2>Publisher Location</h2>
+<p>This should be how you want the location to appear - no special formatting takes place.
+For instance, if you're citing a work published by Penguin out of NYC you'd want to enter
+"New York City, NY, USA".
+<h2>Next Button</h2>
+<p>If you click next and nothing happens, you're likely missing a piece of information. Future versions will deal with missing info in a manner consistent with APA guidelines. Looking at the console (CTRL+Shift+K on Firefox (GNU/Linux)) should give you info on what's missing.</p>
+</body>
+</html>
